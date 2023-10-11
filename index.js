@@ -103,7 +103,7 @@ app.get("/api/department-data", async (req, res) => {
     const departmentData = await Project.aggregate([
       {
         $group: {
-          _id: "$department",
+          _id: "$dept",
           totalData: { $sum: 1 }, // Calculate total data for each department
           totalClosed: {
             $sum: {

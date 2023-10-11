@@ -88,7 +88,7 @@ app.get("/api/project", async (req, res) => {
 });
 
 //count project
-app.get("/api/projects/count", (req, res) => {
+app.get("/api/project/count", (req, res) => {
   ProjectModel.countDocuments({}, (err, count) => {
     if (err) {
       console.error("Error counting projects:", err);

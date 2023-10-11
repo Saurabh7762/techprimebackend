@@ -87,6 +87,17 @@ app.get("/api/project", async (req, res) => {
   }
 });
 
+//count project
+app.get("/api/projects/count", (req, res) => {
+  ProjectModel.countDocuments({}, (err, count) => {
+    if (err) {
+      console.error("Error counting projects:", err);
+      return res.status(500).send("Internal Server Error");
+    }
+    res.json({ count });
+  });
+});
+
 app.get("/api/projects/deptwise", async (req, res) => {
   let chartData = await Project.aggregate([
     {

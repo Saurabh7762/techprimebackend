@@ -127,7 +127,35 @@ app.get("/api/projects/deptwise", async (req, res) => {
   res.status(200).send(chartData);
 });
 
-app.patch("/api/project/:id", (req, res) => {
+
+app.patch("/api/project/:id", async (req, res) => {
+  try {
+    // Get the id from the request parameters
+    const projectId = req.params.id;
+
+    // Update the project with the provided data in req.body
+    const updatedProject = await Project.findOneAndUpdate(
+      { _id: projectId },
+      req.body,
+      {
+        new: true,
+      }
+    );
+
+    if (!updatedProject) {
+      // Project not found
+      return res.status(404).send("Project not found");
+    }
+
+    console.log(updatedProject);
+    res.status(204).send("Update Successful!");
+  } catch (error) {
+    console.error("Error updating project status:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+/*app.patch("/api/project/:id", (req, res) => {
   // Get the id from the request parameters
   const projectId = req.params.id;
 
@@ -137,7 +165,7 @@ app.patch("/api/project/:id", (req, res) => {
   });
   console.log(project);
   res.status(204).send("Update Successfull!");
-});
+});*/
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

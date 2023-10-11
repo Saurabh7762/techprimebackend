@@ -107,7 +107,7 @@ app.get("/api/department-data", async (req, res) => {
           totalData: { $sum: 1 }, // Calculate total data for each department
           totalClosed: {
             $sum: {
-              $cond: [{ $eq: ["$status", "close"] }, 1, 0], // Calculate total closed data for each department
+              $cond: [{ $eq: ["$status", "Closed"] }, 1, 0], // Calculate total closed data for each department
             },
           },
         },

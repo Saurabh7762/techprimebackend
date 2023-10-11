@@ -98,6 +98,33 @@ app.get("/api/project/count", (req, res) => {
   });
 });
 
+app.get("/api/department-data", async (req, res) => {
+  try {
+    const departmentData = await Project.aggregate([
+      {
+        $group: {
+          _id: "$department",
+          totalData: { $sum: 1 }, // Calculate total data for each department
+          totalClosed: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "close"] }, 1, 0], // Calculate total closed data for each department
+            },
+          },
+        },
+      },
+    ]);
+
+    res.json(departmentData);
+  } catch (error) {
+    res
+      .status(500)
+      .json({
+        message: "Error fetching department data",
+        error: error.message,
+      });
+  }
+});
+
 app.get("/api/projects/deptwise", async (req, res) => {
   let chartData = await Project.aggregate([
     {

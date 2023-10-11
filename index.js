@@ -124,7 +124,7 @@ app.get("/api/department-data", async (req, res) => {
       });
   }
 });
-
+/*
 app.get("/api/projects/deptwise", async (req, res) => {
   let chartData = await Project.aggregate([
     {
@@ -153,6 +153,7 @@ app.get("/api/projects/deptwise", async (req, res) => {
 
   res.status(200).send(chartData);
 });
+*/
 
 
 app.patch("/api/project/:id", async (req, res) => {

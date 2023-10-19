@@ -6,7 +6,6 @@ const cors=require('cors');
 const jwt=require('jsonwebtoken');
 
 
-
 app.use(cors());
 
 // Assuming projectSchema.js exports a mongoose model
@@ -98,6 +97,7 @@ app.get("/api/project/count", (req, res) => {
   });
 });
 
+//department wise total and closing deta
 app.get("/api/department-data", async (req, res) => {
   try {
     const departmentData = await Project.aggregate([
@@ -124,36 +124,39 @@ app.get("/api/department-data", async (req, res) => {
       });
   }
 });
-/*
-app.get("/api/projects/deptwise", async (req, res) => {
-  let chartData = await Project.aggregate([
-    {
-      $match: {
-        status: { $in: ["registered", "Completed"] },
-      },
-    },
-    {
-      $group: {
-        _id: { dept: "$dept", status: "$status" },
-        count: { $sum: 1 },
-      },
-    },
-    {
-      $group: {
-        _id: "$_id.dept",
-        statuses: {
-          $push: {
-            status: "$_id.status",
-            count: "$count",
-          },
-        },
-      },
-    },
-  ]);
 
-  res.status(200).send(chartData);
+//project stats
+
+app.get("/api/project/stats", async (req, res) => {
+  try {
+    const projects = await Project.find();
+    const totalIds = projects.length;
+    const totalClosedIds = projects.filter(
+      (project) => project.status === "Closed"
+    ).length;
+    const totalRunningIds = projects.filter(
+      (project) => project.status === "Running"
+    ).length;
+    const totalCancelIds = projects.filter(
+      (project) => project.status === "Cancel"
+    ).length;
+    const closerIds = projects.filter(
+      (project) =>
+        project.status === "Running" && new Date(project.endDate) < new Date()
+    ).length;
+
+    res.json({
+      totalIds,
+      totalClosedIds,
+      totalRunningIds,
+      totalCancelIds,
+      closerIds,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to calculate project statistics" });
+  }
 });
-*/
+
 
 
 app.patch("/api/project/:id", async (req, res) => {
@@ -183,17 +186,6 @@ app.patch("/api/project/:id", async (req, res) => {
   }
 });
 
-/*app.patch("/api/project/:id", (req, res) => {
-  // Get the id from the request parameters
-  const projectId = req.params.id;
-
-  // Update the project with the provided data in req.body
-  let project = Project.findOneAndUpdate({ id: projectId }, req.body, {
-    new: true,
-  });
-  console.log(project);
-  res.status(204).send("Update Successfull!");
-});*/
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

@@ -182,6 +182,8 @@ app.get("/api/project/stats", async (req, res) => {
     ];
 
     const projectStats = await Project.aggregate(pipeline);
+    const projects = await Project.find();
+
 
     // Calculate "Total" count including "Registered"
     const totalIds = projectStats.reduce(
@@ -190,12 +192,10 @@ app.get("/api/project/stats", async (req, res) => {
     );
 
     // Calculate "Closure Delay" count using the same aggregation pipeline
-    const closerIds = projectStats
-      .filter(
-        (stat) =>
-          stat.status === "Running" && new Date(stat.endDate) < new Date()
-      )
-      .reduce((total, stat) => total + stat.count, 0);
+    const closerIds = projects.filter(
+      (project) =>
+        project.status === "Running" && new Date(project.endDate) < new Date()
+    ).length;
 
     // Add "Total" and "Closure Delay" to the project statistics
     projectStats.push({ status: "Total", count: totalIds });

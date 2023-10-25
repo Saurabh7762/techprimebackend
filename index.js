@@ -163,6 +163,7 @@ app.get("/api/project/stats", async (req, res) => {
       {
         $match: {
           status: { $ne: "Registered" }, // Exclude "Registered" group
+          endDate: { $exists: true },
         },
       },
       {

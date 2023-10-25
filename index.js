@@ -160,12 +160,7 @@ app.get("/api/project/stats", async (req, res) => {
 app.get("/api/project/stats", async (req, res) => {
   try {
     const pipeline = [
-      {
-        $match: {
-          status: { $ne: "Registered" }, // Exclude "Registered" group
-          endDate: { $exists: true }, // Only consider projects with endDate
-        },
-      },
+      
       {
         $group: {
           _id: "$status",

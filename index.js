@@ -160,7 +160,12 @@ app.get("/api/project/stats", async (req, res) => {
 app.get("/api/project/stats", async (req, res) => {
   try {
     const pipeline = [
-      
+      {
+        $match: {
+          status: { $ne: "Excluded" }, // Exclude any other status you want to exclude
+          endDate: { $exists: true }, // Only consider projects with endDate
+        },
+      },
       {
         $group: {
           _id: "$status",
@@ -178,7 +183,7 @@ app.get("/api/project/stats", async (req, res) => {
 
     const projectStats = await Project.aggregate(pipeline);
 
-    // Calculate "Total" count by summing counts in projectStats
+    // Calculate "Total" count including "Registered"
     const totalIds = projectStats.reduce(
       (total, stat) => total + stat.count,
       0
@@ -192,7 +197,7 @@ app.get("/api/project/stats", async (req, res) => {
       )
       .reduce((total, stat) => total + stat.count, 0);
 
-    // Replace "Total" and "Closure Delay" in projectStats
+    // Add "Total" and "Closure Delay" to the project statistics
     projectStats.push({ status: "Total", count: totalIds });
     projectStats.push({ status: "Closure Delay", count: closerIds });
 

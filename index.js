@@ -177,16 +177,12 @@ app.get("/api/project/stats", async (req, res) => {
 
     const projectStats = await Project.aggregate(pipeline);
 
-    const stats = projectStats.reduce((accumulator, stat) => {
-      accumulator[stat.status] = stat.count;
-      return accumulator;
-    }, {});
-
-    res.json(stats);
+    res.json(projectStats);
   } catch (error) {
     res.status(500).json({ error: "Failed to calculate project statistics" });
   }
 });
+
 
 
 

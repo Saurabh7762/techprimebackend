@@ -126,7 +126,7 @@ app.get("/api/department-data", async (req, res) => {
 });
 
 //project stats
-
+/*
 app.get("/api/project/stats", async (req, res) => {
   try {
     const projects = await Project.find();
@@ -152,6 +152,37 @@ app.get("/api/project/stats", async (req, res) => {
       totalCancelIds,
       closerIds,
     });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to calculate project statistics" });
+  }
+});
+*/
+app.get("/api/project/stats", async (req, res) => {
+  try {
+    const pipeline = [
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          status: "$_id",
+          count: 1,
+        },
+      },
+    ];
+
+    const projectStats = await Project.aggregate(pipeline);
+
+    const stats = projectStats.reduce((accumulator, stat) => {
+      accumulator[stat.status] = stat.count;
+      return accumulator;
+    }, {});
+
+    res.json(stats);
   } catch (error) {
     res.status(500).json({ error: "Failed to calculate project statistics" });
   }

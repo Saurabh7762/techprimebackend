@@ -161,6 +161,11 @@ app.get("/api/project/stats", async (req, res) => {
   try {
     const pipeline = [
       {
+        $match: {
+          status: { $ne: "Registered" }, // Exclude "Registered" group
+        },
+      },
+      {
         $group: {
           _id: "$status",
           count: { $sum: 1 },
@@ -182,6 +187,7 @@ app.get("/api/project/stats", async (req, res) => {
     res.status(500).json({ error: "Failed to calculate project statistics" });
   }
 });
+
 
 
 

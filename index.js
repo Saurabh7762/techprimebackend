@@ -162,8 +162,7 @@ app.get("/api/project/stats", async (req, res) => {
     const pipeline = [
       {
         $match: {
-          status: { $ne: "Excluded" }, // Exclude any other status you want to exclude
-          endDate: { $exists: true }, // Only consider projects with endDate
+          status: { $ne: "Registered" }, // Exclude "Registered" group
         },
       },
       {
@@ -182,20 +181,16 @@ app.get("/api/project/stats", async (req, res) => {
     ];
 
     const projectStats = await Project.aggregate(pipeline);
+
+    //Calculate "Total" count including "Registered" and Closure Delay
     const projects = await Project.find();
 
+    const totalIds = projects.length; // Calculate "Total"
 
-    // Calculate "Total" count including "Registered"
-    const totalIds = projectStats.reduce(
-      (total, stat) => total + stat.count,
-      0
-    );
-
-    // Calculate "Closure Delay" count using the same aggregation pipeline
     const closerIds = projects.filter(
       (project) =>
         project.status === "Running" && new Date(project.endDate) < new Date()
-    ).length;
+    ).length; //Calculate Closure Delay
 
     // Add "Total" and "Closure Delay" to the project statistics
     projectStats.push({ status: "Total", count: totalIds });

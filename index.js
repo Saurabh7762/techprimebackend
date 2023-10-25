@@ -182,11 +182,26 @@ app.get("/api/project/stats", async (req, res) => {
 
     const projectStats = await Project.aggregate(pipeline);
 
+    // Calculate "Total" and "Closure Delay" counts separately
+    const totalIds = projectStats.reduce(
+      (total, stat) => total + stat.count,
+      0
+    );
+    const closerIds = projects.filter(
+      (project) =>
+        project.status === "Running" && new Date(project.endDate) < new Date()
+    ).length;
+
+    // Add "Total" and "Closure Delay" to the project statistics
+    projectStats.push({ status: "Total", count: totalIds });
+    projectStats.push({ status: "Closure Delay", count: closerIds });
+
     res.json(projectStats);
   } catch (error) {
     res.status(500).json({ error: "Failed to calculate project statistics" });
   }
 });
+
 
 
 
